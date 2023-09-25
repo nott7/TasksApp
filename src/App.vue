@@ -1,32 +1,89 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar app color="primary" dark>
+      <router-link to="/">
+        <v-btn text class="title">Nott's Tasks App</v-btn>
+      </router-link>
+      <v-spacer></v-spacer>
+      <router-link to="/">
+        <v-btn text>Home</v-btn>
+      </router-link>
+      <router-link to="/completed">
+        <v-btn text>Completed</v-btn>
+      </router-link>
+      <router-link to="/comics">
+        <v-btn text>Comics</v-btn>
+      </router-link>
+      <router-link to="/login">
+        <v-btn text>Login</v-btn>
+      </router-link>
+    </v-app-bar>
+
+    <v-main>
+      <router-view
+        :tasks="selectTasks"
+        v-on:del-task="deleteTask"
+        v-on:rename-task="renameTask"
+        v-on:add-task="addTask"
+        v-on:login="login"
+        :username="username"
+        :usernames="usernames"
+      />
+    </v-main>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+export default {
+  name: "App",
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+  data: () => ({
+    tasks: [],
+    username: "",
+    usernames: [],
+  }),
+  methods: {
+    addTask(newTask) {
+      this.tasks = [...this.tasks, newTask];
+    },
+    deleteTask(id) {
+      this.tasks = this.tasks.filter((task) => task.id !== id);
+    },
+    renameTask({ title, id }) {
+      this.tasks = this.tasks.map((task) => {
+        if (task.id === id) {
+          return {
+            ...task,
+            title,
+          };
+        }
+        return task;
+      });
+    },
+    login(username) {
+      this.username = username;
+      this.usernames = [...this.usernames, username];
+    },
+    completeTask(id) {
+      this.tasks = this.tasks.map((task) => {
+        if (task.id === id) {
+          return {
+            ...task,
+            completed: true,
+          };
+        }
+        return task;
+      });
+    },
+  },
+  computed: {
+    selectTasks() {
+      if (this.$route.path === "/completed") {
+        return this.tasks.filter((task) => task.completed);
+      } else {
+        return this.tasks.filter((task) => !task.completed);
+      }
+    },
+  },
+};
+</script>
