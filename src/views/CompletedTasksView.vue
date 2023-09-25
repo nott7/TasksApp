@@ -59,7 +59,6 @@ export default {
   components: {
     Tasks,
   },
-  // TODO: Scrivere meglio questa funzione
   methods: {
     filterBySelectedUser() {
       if (this.selectedUser === "" || this.selectedUser === null) {
@@ -71,24 +70,28 @@ export default {
       }
     },
 
+    filterBySearch() {
+      let filteredTasks = [];
+      if (this.selectedUser === "" || this.selectedUser === null) {
+        filteredTasks = this.tasks.filter(
+          (task) =>
+            task.title.toLowerCase().includes(this.search.toLowerCase()) ||
+            task.username.toLowerCase().includes(this.search)
+        );
+      } else {
+        filteredTasks = this.tasks
+          .filter((task) => task.username === this.selectedUser)
+          .filter((task) => task.title.includes(this.search));
+      }
+
+      this.localTasks = filteredTasks;
+    },
+
     filterTasks() {
       if (this.search === "") {
         this.filterBySelectedUser();
       } else {
-        let filteredTasks = [];
-        if (this.selectedUser === "" || this.selectedUser === null) {
-          filteredTasks = this.tasks.filter(
-            (task) =>
-              task.title.toLowerCase().includes(this.search.toLowerCase()) ||
-              task.username.toLowerCase().includes(this.search)
-          );
-        } else {
-          filteredTasks = this.tasks
-            .filter((task) => task.username === this.selectedUser)
-            .filter((task) => task.title.includes(this.search));
-        }
-
-        this.localTasks = filteredTasks;
+        this.filterBySearch();
       }
     },
     onTaskCompleted(task) {
